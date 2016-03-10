@@ -3,25 +3,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <LinearLayout
+    <android.opengl.GLSurfaceView
+        android:id="@+id/surfaceView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/bar">
-
-        <android.opengl.GLSurfaceView
-            android:id="@+id/surfaceView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:layout_above="@+id/bar" />
-
-        <android.opengl.GLSurfaceView
-            android:id="@+id/surfaceView2"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:layout_above="@+id/bar" />
-    </LinearLayout>
+        android:layout_weight="1"
+        android:layout_above="@+id/bar" />
 
 
     <ImageView

@@ -274,7 +274,6 @@ public class ActivityCamera extends Activity implements OnSeekBarChangeListener,
             mCameraHelper.getCameraInfo(mCurrentCameraId, cameraInfo);
             boolean flipHorizontal = cameraInfo.facing == CameraInfo.CAMERA_FACING_FRONT;
             mGPUImage.setUpCamera(mCameraInstance, orientation, flipHorizontal, false);
-            //mGPUImage2.setUpCamera(mCameraInstance, orientation, flipHorizontal, false);
         }
 
         /** A safe way to get an instance of the Camera object. */
