@@ -502,7 +502,7 @@ public class GPUImageFilterTools {
         private class SobelAdjuster extends Adjuster<GPUImageSobelEdgeDetection> {
             @Override
             public void adjust(final int percentage) {
-                getFilter().setLineSize(range(percentage, 0.0f, 5.0f));
+                getFilter().setLineSize(range(percentage, 0.0f, 20.0f));
             }
         }
 
