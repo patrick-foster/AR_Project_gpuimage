@@ -11,7 +11,7 @@ This project uses [GPUImage for Android](https://github.com/CyberAgent/android-g
 
 See the section "TODO" for future goals.
 
-**NOTE:** This application is meant to be used with a headset.
+**NOTE:** This application is meant to be used with a headset. This application has only been tested using the Android Galaxy Note 3
 
 
 ## Requirements
@@ -70,8 +70,8 @@ gradle clean assemble
 The following goals are planned for the application:
 - [ ] Add a working dilation filter to the sobel edge detection filter to increase text size
 - [ ] Human testing (need to go through ethics board first)
-- [ ] (maybe) Interfacing with headset magnet
-- [ ] (maybe) Add additional filters according to needs of users
+- [ ] Interfacing with headset magnet (maybe)
+- [ ] Add additional filters according to needs of users (maybe)
 
 
 ## License
