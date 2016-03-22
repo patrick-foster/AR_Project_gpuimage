@@ -165,9 +165,11 @@ public class GPUImageFilterTools {
                 return new GPUImagePosterizeFilter();
             case FILTER_GROUP:
                 List<GPUImageFilter> filters = new LinkedList<GPUImageFilter>();
-                filters.add(new GPUImageContrastFilter());
+                //filters.add(new GPUImageContrastFilter());
                 filters.add(new GPUImageDirectionalSobelEdgeDetectionFilter());
-                filters.add(new GPUImageGrayscaleFilter());
+                filters.add(new GPUImageGaussianBlurFilter());
+                //filters.add(new GPUImageSobelEdgeDetection());
+                //filters.add(new GPUImageGrayscaleFilter());
                 return new GPUImageFilterGroup(filters);
             case SATURATION:
                 return new GPUImageSaturationFilter(1.0f);
