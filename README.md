@@ -1,11 +1,22 @@
-# GPUImage for Android
+# Augmented Reality Senior Project (Uses [GPUImage for Android](https://github.com/CyberAgent/android-gpuimage))
 
-Idea from: [iOS GPUImage framework](https://github.com/BradLarson/GPUImage)
+The goal of the project is to have an application which aids those with impaired vision and is suitable for classroom (specifically whiteboard) use.
+This project uses [GPUImage for Android](https://github.com/CyberAgent/android-gpuimage) as a large framework for the application, with several modifications:
 
-Goal is to have something as similar to GPUImage as possible. Vertex and fragment shaders are exactly the same. That way it makes it easier to port filters from GPUImage iOS to Android.
+- Split screen for headset use
+- Modifications to various filters in order to make the application useful for people with visual impairments
+- Zoom functionality
+- Removal of photo-taking capability
+- Bug fixes
+
+See the section "TODO" for future goals.
+
+**NOTE:** This application is meant to be used with a headset.
+
 
 ## Requirements
 * Android 2.2 or higher (OpenGL ES 2.0)
+* Android NDK
 
 ## Usage
 
@@ -35,9 +46,6 @@ public void onCreate(final Bundle savedInstanceState) {
     mGPUImage.setGLSurfaceView((GLSurfaceView) findViewById(R.id.surfaceView));
     mGPUImage.setImage(imageUri); // this loads image on the current thread, should be run in a thread
     mGPUImage.setFilter(new GPUImageSepiaFilter());
-
-    // Later when image should be saved saved:
-    mGPUImage.saveToPictures("GPUImage", "ImageWithFilter.jpg", null);
 }
 ```
 
@@ -57,6 +65,14 @@ Make sure that you run the clean target when using maven.
 ```groovy
 gradle clean assemble
 ```
+
+## TODO
+The following goals are planned for the application:
+- [ ] Add a working dilation filter to the sobel edge detection filter to increase text size
+- [ ] Human testing (need to go through ethics board first)
+- [ ] (maybe) Interfacing with headset magnet
+- [ ] (maybe) Add additional filters according to needs of users
+
 
 ## License
     Copyright 2012 CyberAgent, Inc.
