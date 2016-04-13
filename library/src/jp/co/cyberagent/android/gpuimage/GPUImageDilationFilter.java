@@ -135,6 +135,56 @@ public class GPUImageDilationFilter extends GPUImageTwoPassTextureSamplingFilter
                     "fourStepsPositiveTextureCoordinate = inputTextureCoordinate + (offset * 4.0);\n" +
                     "}\n";
 
+    public static final String VERTEX_SHADER_8 =
+
+            "attribute vec4 position;\n" +
+                    "attribute vec2 inputTextureCoordinate;\n" +
+                    "\n" +
+                    "uniform float texelWidthOffset;\n" +
+                    "uniform float texelHeightOffset;\n" +
+                    "\n" +
+                    "varying vec2 centerTextureCoordinate;\n" +
+                    "varying vec2 oneStepPositiveTextureCoordinate;\n" +
+                    "varying vec2 oneStepNegativeTextureCoordinate;\n" +
+                    "varying vec2 twoStepsPositiveTextureCoordinate;\n" +
+                    "varying vec2 twoStepsNegativeTextureCoordinate;\n" +
+                    "varying vec2 threeStepsPositiveTextureCoordinate;\n" +
+                    "varying vec2 threeStepsNegativeTextureCoordinate;\n" +
+                    "varying vec2 fourStepsPositiveTextureCoordinate;\n" +
+                    "varying vec2 fourStepsNegativeTextureCoordinate;\n" +
+                    "varying vec2 fiveStepPositiveTextureCoordinate;\n" +
+                    "varying vec2 fiveStepNegativeTextureCoordinate;\n" +
+                    "varying vec2 sixStepsPositiveTextureCoordinate;\n" +
+                    "varying vec2 sixStepsNegativeTextureCoordinate;\n" +
+                    "varying vec2 sevenStepsPositiveTextureCoordinate;\n" +
+                    "varying vec2 sevenStepsNegativeTextureCoordinate;\n" +
+                    "varying vec2 eightStepsPositiveTextureCoordinate;\n" +
+                    "varying vec2 eightStepsNegativeTextureCoordinate;\n" +
+                    "\n" +
+                    "void main()\n" +
+                    "{\n" +
+                    "gl_Position = position;\n" +
+                    "\n" +
+                    "vec2 offset = vec2(texelWidthOffset, texelHeightOffset);\n" +
+                    "\n" +
+                    "centerTextureCoordinate = inputTextureCoordinate;\n" +
+                    "oneStepNegativeTextureCoordinate = inputTextureCoordinate - offset;\n" +
+                    "oneStepPositiveTextureCoordinate = inputTextureCoordinate + offset;\n" +
+                    "twoStepsNegativeTextureCoordinate = inputTextureCoordinate - (offset * 2.0);\n" +
+                    "twoStepsPositiveTextureCoordinate = inputTextureCoordinate + (offset * 2.0);\n" +
+                    "threeStepsNegativeTextureCoordinate = inputTextureCoordinate - (offset * 3.0);\n" +
+                    "threeStepsPositiveTextureCoordinate = inputTextureCoordinate + (offset * 3.0);\n" +
+                    "fourStepsNegativeTextureCoordinate = inputTextureCoordinate - (offset * 4.0);\n" +
+                    "fourStepsPositiveTextureCoordinate = inputTextureCoordinate + (offset * 4.0);\n" +
+                    "fiveStepNegativeTextureCoordinate = inputTextureCoordinate - (offset * 5.0);\n" +
+                    "fiveStepPositiveTextureCoordinate = inputTextureCoordinate + (offset * 5.0);\n" +
+                    "sixStepsNegativeTextureCoordinate = inputTextureCoordinate - (offset * 6.0);\n" +
+                    "sixStepsPositiveTextureCoordinate = inputTextureCoordinate + (offset * 6.0);\n" +
+                    "sevenStepsNegativeTextureCoordinate = inputTextureCoordinate - (offset * 7.0);\n" +
+                    "sevenStepsPositiveTextureCoordinate = inputTextureCoordinate + (offset * 7.0);\n" +
+                    "eightStepsNegativeTextureCoordinate = inputTextureCoordinate - (offset * 8.0);\n" +
+                    "eightStepsPositiveTextureCoordinate = inputTextureCoordinate + (offset * 8.0);\n" +
+                    "}\n";
 
     public static final String FRAGMENT_SHADER_1 =
             "precision lowp float;\n" +
@@ -256,9 +306,71 @@ public class GPUImageDilationFilter extends GPUImageTwoPassTextureSamplingFilter
                     "gl_FragColor = vec4(vec3(maxValue), 1.0);\n" +
                     "}\n";
 
+    public static final String FRAGMENT_SHADER_8 =
+            "precision lowp float;\n" +
+                    "\n" +
+                    "varying vec2 centerTextureCoordinate;\n" +
+                    "varying vec2 oneStepPositiveTextureCoordinate;\n" +
+                    "varying vec2 oneStepNegativeTextureCoordinate;\n" +
+                    "varying vec2 twoStepsPositiveTextureCoordinate;\n" +
+                    "varying vec2 twoStepsNegativeTextureCoordinate;\n" +
+                    "varying vec2 threeStepsPositiveTextureCoordinate;\n" +
+                    "varying vec2 threeStepsNegativeTextureCoordinate;\n" +
+                    "varying vec2 fourStepsPositiveTextureCoordinate;\n" +
+                    "varying vec2 fourStepsNegativeTextureCoordinate;\n" +
+                    "varying vec2 fiveStepPositiveTextureCoordinate;\n" +
+                    "varying vec2 fiveStepNegativeTextureCoordinate;\n" +
+                    "varying vec2 sixStepsPositiveTextureCoordinate;\n" +
+                    "varying vec2 sixStepsNegativeTextureCoordinate;\n" +
+                    "varying vec2 sevenStepsPositiveTextureCoordinate;\n" +
+                    "varying vec2 sevenStepsNegativeTextureCoordinate;\n" +
+                    "varying vec2 eightStepsPositiveTextureCoordinate;\n" +
+                    "varying vec2 eightStepsNegativeTextureCoordinate;\n" +
+                    "\n" +
+                    "uniform sampler2D inputImageTexture;\n" +
+                    "\n" +
+                    "void main()\n" +
+                    "{\n" +
+                    "float centerIntensity = texture2D(inputImageTexture, centerTextureCoordinate).r;\n" +
+                    "float oneStepPositiveIntensity = texture2D(inputImageTexture, oneStepPositiveTextureCoordinate).r;\n" +
+                    "float oneStepNegativeIntensity = texture2D(inputImageTexture, oneStepNegativeTextureCoordinate).r;\n" +
+                    "float twoStepsPositiveIntensity = texture2D(inputImageTexture, twoStepsPositiveTextureCoordinate).r;\n" +
+                    "float twoStepsNegativeIntensity = texture2D(inputImageTexture, twoStepsNegativeTextureCoordinate).r;\n" +
+                    "float threeStepsPositiveIntensity = texture2D(inputImageTexture, threeStepsPositiveTextureCoordinate).r;\n" +
+                    "float threeStepsNegativeIntensity = texture2D(inputImageTexture, threeStepsNegativeTextureCoordinate).r;\n" +
+                    "float fourStepsPositiveIntensity = texture2D(inputImageTexture, fourStepsPositiveTextureCoordinate).r;\n" +
+                    "float fourStepsNegativeIntensity = texture2D(inputImageTexture, fourStepsNegativeTextureCoordinate).r;\n" +
+                    "float fiveStepPositiveIntensity = texture2D(inputImageTexture, fiveStepPositiveTextureCoordinate).r;\n" +
+                    "float fiveStepNegativeIntensity = texture2D(inputImageTexture, fiveStepNegativeTextureCoordinate).r;\n" +
+                    "float sixStepsPositiveIntensity = texture2D(inputImageTexture, sixStepsPositiveTextureCoordinate).r;\n" +
+                    "float sixStepsNegativeIntensity = texture2D(inputImageTexture, sixStepsNegativeTextureCoordinate).r;\n" +
+                    "float sevenStepsPositiveIntensity = texture2D(inputImageTexture, sevenStepsPositiveTextureCoordinate).r;\n" +
+                    "float sevenStepsNegativeIntensity = texture2D(inputImageTexture, sevenStepsNegativeTextureCoordinate).r;\n" +
+                    "float eightStepsPositiveIntensity = texture2D(inputImageTexture, eightStepsPositiveTextureCoordinate).r;\n" +
+                    "float eightStepsNegativeIntensity = texture2D(inputImageTexture, eightStepsNegativeTextureCoordinate).r;\n" +
+                    "\n" +
+                    "lowp float maxValue = max(centerIntensity, oneStepPositiveIntensity);\n" +
+                    "maxValue = max(maxValue, oneStepNegativeIntensity);\n" +
+                    "maxValue = max(maxValue, twoStepsPositiveIntensity);\n" +
+                    "maxValue = max(maxValue, twoStepsNegativeIntensity);\n" +
+                    "maxValue = max(maxValue, threeStepsPositiveIntensity);\n" +
+                    "maxValue = max(maxValue, threeStepsNegativeIntensity);\n" +
+                    "maxValue = max(maxValue, fourStepsPositiveIntensity);\n" +
+                    "maxValue = max(maxValue, fourStepsNegativeIntensity);\n" +
+                    "maxValue = max(maxValue, fiveStepPositiveIntensity);\n" +
+                    "maxValue = max(maxValue, fiveStepNegativeIntensity);\n" +
+                    "maxValue = max(maxValue, sixStepsPositiveIntensity);\n" +
+                    "maxValue = max(maxValue, sixStepsNegativeIntensity);\n" +
+                    "maxValue = max(maxValue, sevenStepsPositiveIntensity);\n" +
+                    "maxValue = max(maxValue, sevenStepsNegativeIntensity);\n" +
+                    "maxValue = max(maxValue, eightStepsPositiveIntensity);\n" +
+                    "maxValue = max(maxValue, eightStepsNegativeIntensity);\n" +
+                    "\n" +
+                    "gl_FragColor = vec4(vec3(maxValue), 1.0);\n" +
+                    "}\n";
 
     public GPUImageDilationFilter() {
-        this(1);
+        this(8);
     }
 
     /**
@@ -284,8 +396,10 @@ public class GPUImageDilationFilter extends GPUImageTwoPassTextureSamplingFilter
                 return VERTEX_SHADER_2;
             case 3:
                 return VERTEX_SHADER_3;
-            default:
+            case 4:
                 return VERTEX_SHADER_4;
+            default:
+                return VERTEX_SHADER_8;
         }
     }
 
@@ -298,8 +412,10 @@ public class GPUImageDilationFilter extends GPUImageTwoPassTextureSamplingFilter
                 return FRAGMENT_SHADER_2;
             case 3:
                 return FRAGMENT_SHADER_3;
-            default:
+            case 4:
                 return FRAGMENT_SHADER_4;
+            default:
+                return FRAGMENT_SHADER_8;
         }
     }
 }

@@ -198,11 +198,11 @@ public class GPUImageFilterGroup extends GPUImageFilter {
                 }
 
                 if (i == 0) {
-                    onDraw(previousTexture, cubeBuffer, textureBuffer, isNotLast, filter);
+                    filter.onDraw(previousTexture, cubeBuffer, textureBuffer, isNotLast);
                 } else if (i == size - 1) {
-                    onDraw(previousTexture, mGLCubeBuffer, (size % 2 == 0) ? mGLTextureFlipBuffer : mGLTextureBuffer, isNotLast, filter);
+                    filter.onDraw(previousTexture, mGLCubeBuffer, (size % 2 == 0) ? mGLTextureFlipBuffer : mGLTextureBuffer, isNotLast);
                 } else {
-                    onDraw(previousTexture, mGLCubeBuffer, mGLTextureBuffer, isNotLast, filter);
+                    filter.onDraw(previousTexture, mGLCubeBuffer, mGLTextureBuffer, isNotLast);
                 }
 
                 if (isNotLast) {
@@ -211,39 +211,7 @@ public class GPUImageFilterGroup extends GPUImageFilter {
                 }
             }
         }
-    }
-
-    private void onDraw(final int textureID, final FloatBuffer cubeBuffer,
-                        final FloatBuffer textureBuffer, boolean isNotLast, GPUImageFilter filter) {
-        if (isNotLast) {
-            GLES20.glViewport(0, 0, mOutputWidth, mOutputHeight);
-            GLES20.glUseProgram(mGLProgId);
-            runPendingOnDrawTasks();
-            if (!filter.isInitialized()) {
-                return;
-            }
-
-            cubeBuffer.position(0);
-            GLES20.glVertexAttribPointer(mGLAttribPosition, 2, GLES20.GL_FLOAT, false, 0, cubeBuffer);
-            GLES20.glEnableVertexAttribArray(mGLAttribPosition);
-            textureBuffer.position(0);
-            GLES20.glVertexAttribPointer(mGLAttribTextureCoordinate, 2, GLES20.GL_FLOAT, false, 0,
-                    textureBuffer);
-            GLES20.glEnableVertexAttribArray(mGLAttribTextureCoordinate);
-            if (textureID != OpenGlUtils.NO_TEXTURE) {
-                GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-                GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureID);
-                GLES20.glUniform1i(mGLUniformTexture, 0);
-            }
-            onDrawArraysPre();
-            GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
-            GLES20.glDisableVertexAttribArray(mGLAttribPosition);
-            GLES20.glDisableVertexAttribArray(mGLAttribTextureCoordinate);
-            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
-        } else {
-            filter.onDraw(textureID, cubeBuffer, textureBuffer);
-        }
-    }
+     }
 
     /**
      * Gets the filters.

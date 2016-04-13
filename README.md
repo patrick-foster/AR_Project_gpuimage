@@ -68,10 +68,9 @@ gradle clean assemble
 
 ## TODO
 The following goals are planned for the application:
-- [ ] Add a working dilation filter to the sobel edge detection filter to increase text size
+- [ X ] Add a working dilation filter to the sobel edge detection filter to increase text size
 - [ ] Human testing (need to go through ethics board first)
-- [ ] Interfacing with headset magnet (maybe)
-- [ ] Add additional filters according to needs of users (maybe)
+- [ ] Add pinch zoom
 
 
 ## License

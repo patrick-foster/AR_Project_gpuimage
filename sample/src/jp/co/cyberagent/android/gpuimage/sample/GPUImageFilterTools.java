@@ -45,7 +45,11 @@ public class GPUImageFilterTools {
         filters.addFilter("3x3 Convolution", FilterType.THREE_X_THREE_CONVOLUTION);
         filters.addFilter("Emboss", FilterType.EMBOSS);
         filters.addFilter("Posterize", FilterType.POSTERIZE);
-        filters.addFilter("Grouped filters", FilterType.FILTER_GROUP);
+        filters.addFilter("Grouped filters 1", FilterType.FILTER_GROUP1);
+        filters.addFilter("Grouped filters 2", FilterType.FILTER_GROUP2);
+        filters.addFilter("Grouped filters 3", FilterType.FILTER_GROUP3);
+        filters.addFilter("Grouped filters 4", FilterType.FILTER_GROUP4);
+        filters.addFilter("Grouped filters 5", FilterType.FILTER_GROUP5);
         filters.addFilter("Saturation", FilterType.SATURATION);
         filters.addFilter("Exposure", FilterType.EXPOSURE);
         filters.addFilter("Highlight Shadow", FilterType.HIGHLIGHT_SHADOW);
@@ -163,13 +167,30 @@ public class GPUImageFilterTools {
                 return new GPUImageEmbossFilter();
             case POSTERIZE:
                 return new GPUImagePosterizeFilter();
-            case FILTER_GROUP:
+            case FILTER_GROUP1:
                 List<GPUImageFilter> filters = new LinkedList<GPUImageFilter>();
-                //filters.add(new GPUImageContrastFilter());
-                filters.add(new GPUImageDirectionalSobelEdgeDetectionFilter());
-                filters.add(new GPUImageGaussianBlurFilter());
-                //filters.add(new GPUImageSobelEdgeDetection());
-                //filters.add(new GPUImageGrayscaleFilter());
+                filters.add(new GPUImageSobelEdgeDetection());
+                filters.add(new GPUImageDilationFilter(1));
+                return new GPUImageFilterGroup(filters);
+            case FILTER_GROUP2:
+                filters = new LinkedList<GPUImageFilter>();
+                filters.add(new GPUImageSobelEdgeDetection());
+                filters.add(new GPUImageDilationFilter(2));
+                return new GPUImageFilterGroup(filters);
+            case FILTER_GROUP3:
+                filters = new LinkedList<GPUImageFilter>();
+                filters.add(new GPUImageSobelEdgeDetection());
+                filters.add(new GPUImageDilationFilter(3));
+                return new GPUImageFilterGroup(filters);
+            case FILTER_GROUP4:
+                filters = new LinkedList<GPUImageFilter>();
+                filters.add(new GPUImageSobelEdgeDetection());
+                filters.add(new GPUImageDilationFilter(4));
+                return new GPUImageFilterGroup(filters);
+            case FILTER_GROUP5:
+                filters = new LinkedList<GPUImageFilter>();
+                filters.add(new GPUImageSobelEdgeDetection());
+                filters.add(new GPUImageDilationFilter(8));
                 return new GPUImageFilterGroup(filters);
             case SATURATION:
                 return new GPUImageSaturationFilter(1.0f);
@@ -314,7 +335,7 @@ public class GPUImageFilterTools {
     private static GPUImageFilter createBlendFilter(Context context, Class<? extends GPUImageTwoInputFilter> filterClass) {
         try {
             GPUImageTwoInputFilter filter = filterClass.newInstance();
-            filter.setBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher));
+            //filter.setBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher));
             return filter;
         } catch (Exception e) {
             e.printStackTrace();
@@ -327,10 +348,10 @@ public class GPUImageFilterTools {
     }
 
     private enum FilterType {
-        CONTRAST, GRAYSCALE, SHARPEN, SEPIA, SOBEL_EDGE_DETECTION, THREE_X_THREE_CONVOLUTION, FILTER_GROUP, EMBOSS, POSTERIZE, GAMMA, BRIGHTNESS, INVERT, HUE, PIXELATION,
-        SATURATION, EXPOSURE, HIGHLIGHT_SHADOW, MONOCHROME, OPACITY, RGB, WHITE_BALANCE, VIGNETTE, TONE_CURVE, BLEND_COLOR_BURN, BLEND_COLOR_DODGE, BLEND_DARKEN, BLEND_DIFFERENCE,
-        BLEND_DISSOLVE, BLEND_EXCLUSION, BLEND_SOURCE_OVER, BLEND_HARD_LIGHT, BLEND_LIGHTEN, BLEND_ADD, BLEND_DIVIDE, BLEND_MULTIPLY, BLEND_OVERLAY, BLEND_SCREEN, BLEND_ALPHA,
-        BLEND_COLOR, BLEND_HUE, BLEND_SATURATION, BLEND_LUMINOSITY, BLEND_LINEAR_BURN, BLEND_SOFT_LIGHT, BLEND_SUBTRACT, BLEND_CHROMA_KEY, BLEND_NORMAL, LOOKUP_AMATORKA,
+        CONTRAST, GRAYSCALE, SHARPEN, SEPIA, SOBEL_EDGE_DETECTION, THREE_X_THREE_CONVOLUTION, FILTER_GROUP1, FILTER_GROUP2, FILTER_GROUP3, FILTER_GROUP4, FILTER_GROUP5, EMBOSS, POSTERIZE,
+        GAMMA, BRIGHTNESS, INVERT, HUE, PIXELATION, SATURATION, EXPOSURE, HIGHLIGHT_SHADOW, MONOCHROME, OPACITY, RGB, WHITE_BALANCE, VIGNETTE, TONE_CURVE, BLEND_COLOR_BURN, BLEND_COLOR_DODGE,
+        BLEND_DARKEN, BLEND_DIFFERENCE, BLEND_DISSOLVE, BLEND_EXCLUSION, BLEND_SOURCE_OVER, BLEND_HARD_LIGHT, BLEND_LIGHTEN, BLEND_ADD, BLEND_DIVIDE, BLEND_MULTIPLY, BLEND_OVERLAY, BLEND_SCREEN,
+        BLEND_ALPHA, BLEND_COLOR, BLEND_HUE, BLEND_SATURATION, BLEND_LUMINOSITY, BLEND_LINEAR_BURN, BLEND_SOFT_LIGHT, BLEND_SUBTRACT, BLEND_CHROMA_KEY, BLEND_NORMAL, LOOKUP_AMATORKA,
         GAUSSIAN_BLUR, CROSSHATCH, BOX_BLUR, CGA_COLORSPACE, DILATION, KUWAHARA, RGB_DILATION, SKETCH, TOON, SMOOTH_TOON, BULGE_DISTORTION, GLASS_SPHERE, HAZE, LAPLACIAN, NON_MAXIMUM_SUPPRESSION,
         SPHERE_REFRACTION, SWIRL, WEAK_PIXEL_INCLUSION, FALSE_COLOR, COLOR_BALANCE, LEVELS_FILTER_MIN, BILATERAL_BLUR, HALFTONE, TRANSFORM2D
     }
@@ -351,6 +372,8 @@ public class GPUImageFilterTools {
         public FilterAdjuster(final GPUImageFilter filter) {
             if (filter instanceof GPUImageSharpenFilter) {
                 adjuster = new SharpnessAdjuster().filter(filter);
+            } else if (filter instanceof GPUImageFilterGroup) {
+                adjuster = new GroupAdjuster().filter(filter);
             } else if (filter instanceof GPUImageSepiaFilter) {
                 adjuster = new SepiaAdjuster().filter(filter);
             } else if (filter instanceof GPUImageContrastFilter) {
@@ -498,6 +521,14 @@ public class GPUImageFilterTools {
             @Override
             public void adjust(final int percentage) {
                 getFilter().setIntensity(range(percentage, 0.0f, 2.0f));
+            }
+        }
+
+        private class GroupAdjuster extends Adjuster<GPUImageFilterGroup> {
+            @Override
+            public void adjust(final int percentage) {
+                GPUImage3x3TextureSamplingFilter filterSobel = (GPUImage3x3TextureSamplingFilter) getFilter().getMergedFilters().get(1);
+                filterSobel.setLineSize(range(percentage, 0.0f, 10.0f));
             }
         }
 
