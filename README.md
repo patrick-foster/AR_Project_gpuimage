@@ -68,7 +68,7 @@ gradle clean assemble
 
 ## TODO
 The following goals are planned for the application:
-- [ X ] Add a working dilation filter to the sobel edge detection filter to increase text size
+- [x] Add a working dilation filter to the sobel edge detection filter to increase text size
 - [ ] Human testing (need to go through ethics board first)
 - [ ] Add pinch zoom
 
