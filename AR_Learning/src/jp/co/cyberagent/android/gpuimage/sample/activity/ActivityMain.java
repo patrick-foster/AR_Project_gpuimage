@@ -22,12 +22,12 @@ import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.Parameters;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
-import android.widget.ZoomControls;
-
+import java.util.List;
 import jp.co.cyberagent.android.gpuimage.GPUImage;
 import jp.co.cyberagent.android.gpuimage.GPUImageFilter;
 import jp.co.cyberagent.android.gpuimage.sample.GPUImageFilterTools;
@@ -44,9 +44,7 @@ public class ActivityMain extends Activity implements OnSeekBarChangeListener, O
     private CameraLoader mCamera;
     private GPUImageFilter mFilter;
     private FilterAdjuster mFilterAdjuster;
-    private int currentZoomLevel = 0;
-    private int maxZoomLevel = 0;
-    ZoomControls zoomControls;
+    private float mDist;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -55,16 +53,80 @@ public class ActivityMain extends Activity implements OnSeekBarChangeListener, O
         ((SeekBar) findViewById(R.id.seekBar)).setOnSeekBarChangeListener(this);
         findViewById(R.id.button_choose_filter).setOnClickListener(this);
 
-        zoomControls = (ZoomControls) findViewById(R.id.CAMERA_ZOOM_CONTROLS);
-
         mGPUImage = new GPUImage(this);
         mGPUImage.setGLSurfaceView((GLSurfaceView) findViewById(R.id.surfaceView));
-
 
         mCameraHelper = new CameraHelper(this);
         mCamera = new CameraLoader();
     }
 
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        // Get the pointer ID
+        Camera.Parameters params = mCamera.mCameraInstance.getParameters();
+        int action = event.getAction();
+
+
+        if (event.getPointerCount() > 1) {
+            // handle multi-touch events
+            if (action == MotionEvent.ACTION_POINTER_DOWN) {
+                mDist = getFingerSpacing(event);
+            } else if (action == MotionEvent.ACTION_MOVE && params.isZoomSupported()) {
+                mCamera.mCameraInstance.cancelAutoFocus();
+                handleZoom(event, params);
+            }
+        } else {
+            // handle single touch events
+            if (action == MotionEvent.ACTION_UP) {
+                handleFocus(event, params);
+            }
+        }
+        return true;
+    }
+
+    private void handleZoom(MotionEvent event, Camera.Parameters params) {
+        int maxZoom = params.getMaxZoom();
+        int zoom = params.getZoom();
+        float newDist = getFingerSpacing(event);
+        if (newDist > mDist) {
+            //zoom in
+            if (zoom < maxZoom)
+                zoom++;
+        } else if (newDist < mDist) {
+            //zoom out
+            if (zoom > 0)
+                zoom--;
+        }
+        mDist = newDist;
+        params.setZoom(zoom);
+        mCamera.mCameraInstance.setParameters(params);
+    }
+
+    public void handleFocus(MotionEvent event, Camera.Parameters params) {
+        int pointerId = event.getPointerId(0);
+        int pointerIndex = event.findPointerIndex(pointerId);
+        // Get the pointer's current position
+        float x = event.getX(pointerIndex);
+        float y = event.getY(pointerIndex);
+
+        List<String> supportedFocusModes = params.getSupportedFocusModes();
+        if (supportedFocusModes != null && supportedFocusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
+            mCamera.mCameraInstance.autoFocus(new Camera.AutoFocusCallback() {
+                @Override
+                public void onAutoFocus(boolean b, Camera camera) {
+                    // currently set to auto-focus on single touch
+                }
+            });
+        }
+    }
+
+    /** Determine the space between the first two fingers */
+    private float getFingerSpacing(MotionEvent event) {
+        // ...
+        float x = event.getX(0) - event.getX(1);
+        float y = event.getY(0) - event.getY(1);
+        return (float) Math.sqrt(x * x + y * y);
+    }
 
     @Override
     protected void onResume() {
@@ -148,34 +210,6 @@ public class ActivityMain extends Activity implements OnSeekBarChangeListener, O
             mCameraHelper.getCameraInfo(mCurrentCameraId, cameraInfo);
             boolean flipHorizontal = cameraInfo.facing == CameraInfo.CAMERA_FACING_FRONT;
             mGPUImage.setUpCamera(mCameraInstance, orientation, flipHorizontal, false);
-            //mGPUImage2.setUpCamera(mCameraInstance, orientation, flipHorizontal, false);
-            final Parameters params = parameters;
-            if (parameters.isZoomSupported()) {
-                maxZoomLevel = parameters.getMaxZoom();
-                zoomControls.setIsZoomInEnabled(true);
-                zoomControls.setIsZoomOutEnabled(true);
-                zoomControls.setOnZoomInClickListener(new OnClickListener() {
-                    public void onClick(View v) {
-                        if (currentZoomLevel < maxZoomLevel) {
-                            currentZoomLevel++;
-                            params.setZoom(currentZoomLevel);
-                            mCameraInstance.setParameters(params);
-                        }
-                    }
-                });
-
-                zoomControls.setOnZoomOutClickListener(new OnClickListener() {
-                    public void onClick(View v) {
-                        if (currentZoomLevel > 0) {
-                            currentZoomLevel--;
-                            params.setZoom(currentZoomLevel);
-                            mCameraInstance.setParameters(params);
-                        }
-                    }
-                });
-            } else {
-                zoomControls.setVisibility(View.GONE);
-            }
         }
 
         /** A safe way to get an instance of the Camera object. */
